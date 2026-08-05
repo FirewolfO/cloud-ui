@@ -15,8 +15,16 @@ export default defineConfig(({ mode }) => {
       port: 5176,
       strictPort: true,
       proxy: {
-        '/api': { target: signinTarget, changeOrigin: true },
-        '/actuator': { target: signinTarget, changeOrigin: true },
+        '/api': {
+          target: signinTarget,
+          changeOrigin: true,
+          configure: (proxy) => proxy.on('proxyReq', (request) => request.removeHeader('origin')),
+        },
+        '/actuator': {
+          target: signinTarget,
+          changeOrigin: true,
+          configure: (proxy) => proxy.on('proxyReq', (request) => request.removeHeader('origin')),
+        },
       },
     },
     test: {
