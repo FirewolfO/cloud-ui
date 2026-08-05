@@ -1,10 +1,16 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Cloudy, Lock, Message, Phone, User } from '@element-plus/icons-vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { apiMessage } from '@/api/client'
 import { useAuthStore } from '@/stores/auth'
+import {
+  LOGIN_METHOD_OPTIONS,
+  normalizeLoginIdentifier,
+  validateLoginIdentifier,
+  type LoginMethod,
+} from '@/utils/loginIdentifier'
 import { nullable } from '@/utils/user'
 
 interface LoginForm {
@@ -24,14 +30,31 @@ const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 const activeTab = ref<'login' | 'register'>('login')
+const loginMethod = ref<LoginMethod>('username')
 const submitting = ref(false)
 const loginRef = ref<FormInstance>()
 const registerRef = ref<FormInstance>()
 const loginForm = reactive<LoginForm>({ identifier: '', password: '' })
 const registerForm = reactive<RegisterForm>({ username: '', displayName: '', password: '', email: '', phone: '' })
 
+const loginField = computed(() => {
+  if (loginMethod.value === 'phone') {
+    return { label: '手机号', placeholder: '+8613800138000', type: 'tel', autocomplete: 'tel', icon: Phone }
+  }
+  if (loginMethod.value === 'email') {
+    return { label: '邮箱', placeholder: 'name@example.com', type: 'email', autocomplete: 'email', icon: Message }
+  }
+  return { label: '账号', placeholder: '请输入账号', type: 'text', autocomplete: 'username', icon: User }
+})
+
 const loginRules: FormRules<LoginForm> = {
-  identifier: [{ required: true, message: '请输入账号、手机号或邮箱', trigger: 'blur' }],
+  identifier: [{
+    validator: (_rule, value, callback) => {
+      const message = validateLoginIdentifier(loginMethod.value, String(value ?? ''))
+      callback(message ? new Error(message) : undefined)
+    },
+    trigger: 'blur',
+  }],
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
 }
 
@@ -49,11 +72,19 @@ const registerRules: FormRules<RegisterForm> = {
   phone: [{ pattern: /^$|^\+[1-9]\d{7,14}$/, message: '请输入带国家代码的手机号，例如 +8613800138000', trigger: 'blur' }],
 }
 
+watch(loginMethod, () => {
+  loginForm.identifier = ''
+  loginRef.value?.clearValidate('identifier')
+})
+
 async function submitLogin() {
   if (!await loginRef.value?.validate()) return
   submitting.value = true
   try {
-    await auth.login({ identifier: loginForm.identifier.trim(), password: loginForm.password })
+    await auth.login({
+      identifier: normalizeLoginIdentifier(loginMethod.value, loginForm.identifier),
+      password: loginForm.password,
+    })
     loginForm.password = ''
     const redirect = typeof route.query.redirect === 'string' && route.query.redirect.startsWith('/') ? route.query.redirect : '/'
     await router.replace(redirect)
@@ -98,8 +129,15 @@ async function submitRegister() {
       <el-tabs v-model="activeTab" stretch class="auth-tabs">
         <el-tab-pane label="登录" name="login">
           <el-form ref="loginRef" :model="loginForm" :rules="loginRules" label-position="top" @submit.prevent="submitLogin">
-            <el-form-item label="账号" prop="identifier">
-              <el-input v-model="loginForm.identifier" :prefix-icon="User" autocomplete="username" placeholder="账号、手机号或邮箱" />
+            <el-segmented v-model="loginMethod" :options="LOGIN_METHOD_OPTIONS" class="login-methods" />
+            <el-form-item :label="loginField.label" prop="identifier">
+              <el-input
+                v-model="loginForm.identifier"
+                :prefix-icon="loginField.icon"
+                :type="loginField.type"
+                :autocomplete="loginField.autocomplete"
+                :placeholder="loginField.placeholder"
+              />
             </el-form-item>
             <el-form-item label="密码" prop="password">
               <el-input v-model="loginForm.password" :prefix-icon="Lock" type="password" autocomplete="current-password" show-password @keyup.enter="submitLogin" />
