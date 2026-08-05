@@ -15,6 +15,23 @@ export interface LoginInput {
   password: string
 }
 
+export type VerificationChannel = 'EMAIL' | 'PHONE'
+
+export interface VerificationCodeRequest {
+  channel: VerificationChannel
+  identifier: string
+}
+
+export interface VerificationCodeLoginInput extends VerificationCodeRequest {
+  code: string
+}
+
+export interface VerificationCodeIssue {
+  expiresInSeconds: number
+  retryAfterSeconds: number
+  developmentCode: string | null
+}
+
 export interface RegisterInput {
   username: string
   password: string

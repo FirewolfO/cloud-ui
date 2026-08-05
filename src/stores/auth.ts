@@ -1,7 +1,14 @@
 import { defineStore } from 'pinia'
 import { authApi } from '@/api/auth'
 import { isUnauthorized } from '@/api/client'
-import type { CloudUser, LoginInput, ProfileInput, RegisterInput } from '@/types'
+import type {
+  CloudUser,
+  LoginInput,
+  ProfileInput,
+  RegisterInput,
+  VerificationCodeLoginInput,
+  VerificationCodeRequest,
+} from '@/types'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -23,6 +30,13 @@ export const useAuthStore = defineStore('auth', {
     },
     async login(input: LoginInput) {
       this.user = await authApi.login(input)
+      this.checked = true
+    },
+    sendVerificationCode(input: VerificationCodeRequest) {
+      return authApi.sendVerificationCode(input)
+    },
+    async loginWithCode(input: VerificationCodeLoginInput) {
+      this.user = await authApi.loginWithCode(input)
       this.checked = true
     },
     async register(input: RegisterInput) {

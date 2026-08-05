@@ -5,6 +5,8 @@ import type { CloudUser } from '@/types'
 const authApiMock = vi.hoisted(() => ({
   me: vi.fn(),
   login: vi.fn(),
+  sendVerificationCode: vi.fn(),
+  loginWithCode: vi.fn(),
   register: vi.fn(),
   logout: vi.fn(),
   updateProfile: vi.fn(),
@@ -55,11 +57,21 @@ describe('auth store', () => {
 
   it('updates user state after login, registration and profile changes', async () => {
     authApiMock.login.mockResolvedValue(user)
+    authApiMock.sendVerificationCode.mockResolvedValue({
+      expiresInSeconds: 300,
+      retryAfterSeconds: 60,
+      developmentCode: null,
+    })
+    authApiMock.loginWithCode.mockResolvedValue(user)
     authApiMock.register.mockResolvedValue(user)
     authApiMock.updateProfile.mockResolvedValue({ ...user, displayName: 'Alice Cloud' })
     const store = useAuthStore()
 
     await store.login({ identifier: 'alice', password: 'Secret123!' })
+    expect(store.user).toEqual(user)
+    await expect(store.sendVerificationCode({ channel: 'EMAIL', identifier: 'alice@example.com' }))
+      .resolves.toMatchObject({ retryAfterSeconds: 60 })
+    await store.loginWithCode({ channel: 'EMAIL', identifier: 'alice@example.com', code: '123456' })
     expect(store.user).toEqual(user)
     await store.register({ username: 'alice', password: 'Secret123!', displayName: 'Alice', email: null, phone: null })
     await store.updateProfile({ displayName: 'Alice Cloud', email: null, phone: null, avatarUrl: null })

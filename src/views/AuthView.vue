@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Cloudy, Lock, Message, Phone, User } from '@element-plus/icons-vue'
+import { Cloudy, Key, Lock, Message, Phone, User } from '@element-plus/icons-vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { apiMessage } from '@/api/client'
 import { useAuthStore } from '@/stores/auth'
@@ -16,6 +16,7 @@ import { nullable } from '@/utils/user'
 interface LoginForm {
   identifier: string
   password: string
+  code: string
 }
 
 interface RegisterForm {
@@ -32,10 +33,16 @@ const auth = useAuthStore()
 const activeTab = ref<'login' | 'register'>('login')
 const loginMethod = ref<LoginMethod>('username')
 const submitting = ref(false)
+const sendingCode = ref(false)
+const resendSeconds = ref(0)
 const loginRef = ref<FormInstance>()
 const registerRef = ref<FormInstance>()
-const loginForm = reactive<LoginForm>({ identifier: '', password: '' })
+const loginForm = reactive<LoginForm>({ identifier: '', password: '', code: '' })
 const registerForm = reactive<RegisterForm>({ username: '', displayName: '', password: '', email: '', phone: '' })
+let resendTimer: ReturnType<typeof setInterval> | undefined
+
+const usesVerificationCode = computed(() => loginMethod.value !== 'username')
+const verificationChannel = computed(() => loginMethod.value === 'email' ? 'EMAIL' as const : 'PHONE' as const)
 
 const loginField = computed(() => {
   if (loginMethod.value === 'phone') {
@@ -56,6 +63,10 @@ const loginRules: FormRules<LoginForm> = {
     trigger: 'blur',
   }],
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+  code: [
+    { required: true, message: '请输入验证码', trigger: 'blur' },
+    { pattern: /^\d{6}$/, message: '验证码必须为 6 位数字', trigger: 'blur' },
+  ],
 }
 
 const registerRules: FormRules<RegisterForm> = {
@@ -74,18 +85,63 @@ const registerRules: FormRules<RegisterForm> = {
 
 watch(loginMethod, () => {
   loginForm.identifier = ''
+  loginForm.password = ''
+  loginForm.code = ''
+  stopCountdown()
   loginRef.value?.clearValidate('identifier')
 })
+
+onBeforeUnmount(stopCountdown)
+
+function stopCountdown() {
+  if (resendTimer) clearInterval(resendTimer)
+  resendTimer = undefined
+  resendSeconds.value = 0
+}
+
+function startCountdown(seconds: number) {
+  stopCountdown()
+  resendSeconds.value = Math.max(1, Math.floor(seconds))
+  resendTimer = setInterval(() => {
+    resendSeconds.value--
+    if (resendSeconds.value <= 0) stopCountdown()
+  }, 1000)
+}
+
+async function requestVerificationCode() {
+  try {
+    await loginRef.value?.validateField('identifier')
+  } catch {
+    return
+  }
+  sendingCode.value = true
+  try {
+    const result = await auth.sendVerificationCode({
+      channel: verificationChannel.value,
+      identifier: normalizeLoginIdentifier(loginMethod.value, loginForm.identifier),
+    })
+    if (result.developmentCode) loginForm.code = result.developmentCode
+    startCountdown(result.retryAfterSeconds)
+    ElMessage.success(result.developmentCode ? '开发验证码已填入' : '验证码已发送')
+  } catch (error) {
+    ElMessage.error(apiMessage(error, '验证码发送失败'))
+  } finally {
+    sendingCode.value = false
+  }
+}
 
 async function submitLogin() {
   if (!await loginRef.value?.validate()) return
   submitting.value = true
   try {
-    await auth.login({
-      identifier: normalizeLoginIdentifier(loginMethod.value, loginForm.identifier),
-      password: loginForm.password,
-    })
+    const identifier = normalizeLoginIdentifier(loginMethod.value, loginForm.identifier)
+    if (usesVerificationCode.value) {
+      await auth.loginWithCode({ channel: verificationChannel.value, identifier, code: loginForm.code })
+    } else {
+      await auth.login({ identifier, password: loginForm.password })
+    }
     loginForm.password = ''
+    loginForm.code = ''
     const redirect = typeof route.query.redirect === 'string' && route.query.redirect.startsWith('/') ? route.query.redirect : '/'
     await router.replace(redirect)
   } catch (error) {
@@ -139,8 +195,26 @@ async function submitRegister() {
                 :placeholder="loginField.placeholder"
               />
             </el-form-item>
-            <el-form-item label="密码" prop="password">
+            <el-form-item v-if="!usesVerificationCode" label="密码" prop="password">
               <el-input v-model="loginForm.password" :prefix-icon="Lock" type="password" autocomplete="current-password" show-password @keyup.enter="submitLogin" />
+            </el-form-item>
+            <el-form-item v-else label="验证码" prop="code">
+              <div class="verification-row">
+                <el-input
+                  v-model="loginForm.code"
+                  :prefix-icon="Key"
+                  inputmode="numeric"
+                  autocomplete="one-time-code"
+                  maxlength="6"
+                  placeholder="6 位验证码"
+                  @keyup.enter="submitLogin"
+                />
+                <el-button
+                  :loading="sendingCode"
+                  :disabled="submitting || resendSeconds > 0"
+                  @click="requestVerificationCode"
+                >{{ resendSeconds > 0 ? `${resendSeconds}s` : '获取验证码' }}</el-button>
+              </div>
             </el-form-item>
             <el-button class="submit-button" type="primary" native-type="submit" :loading="submitting">登录</el-button>
           </el-form>

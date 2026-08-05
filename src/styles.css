@@ -27,6 +27,8 @@ button, input, textarea { font: inherit; letter-spacing: 0; }
 .auth-brand p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
 .auth-tabs .el-tabs__header { margin-bottom: 24px; }
 .login-methods { width: 100%; margin-bottom: 20px; }
+.verification-row { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) 116px; gap: 10px; }
+.verification-row .el-button { width: 116px; margin: 0; }
 .auth-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
 .submit-button { width: 100%; margin-top: 5px; }
 
@@ -70,6 +72,8 @@ button, input, textarea { font: inherit; letter-spacing: 0; }
 @media (max-width: 700px) {
   .auth-page { align-items: start; padding: 18px 12px; }
   .auth-panel { padding: 22px 20px 26px; }
+  .verification-row { grid-template-columns: minmax(0, 1fr) 108px; gap: 8px; }
+  .verification-row .el-button { width: 108px; }
   .auth-form-grid { grid-template-columns: 1fr; gap: 0; }
   .console-header { padding: 0 14px; }
   .profile-page { width: calc(100% - 24px); padding-top: 18px; }
