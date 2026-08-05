@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { createRequestId } from '@/utils/requestId'
 
 interface ApiEnvelope<T> {
   code: string
@@ -17,7 +18,7 @@ export const api = axios.create({
 })
 
 api.interceptors.request.use((config) => {
-  config.headers.set('X-Request-ID', crypto.randomUUID())
+  config.headers.set('X-Request-ID', createRequestId())
   return config
 })
 
