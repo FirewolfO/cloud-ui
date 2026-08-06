@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ArrowRight, Cloudy, EditPen, SwitchButton } from '@element-plus/icons-vue'
+import { ArrowRight, Cloudy, Setting, SwitchButton } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { apiMessage } from '@/api/client'
 import { useAuthStore } from '@/stores/auth'
@@ -25,9 +25,9 @@ async function logout() {
   }
 }
 
-function openProfile() {
+function openAccount() {
   profileVisible.value = false
-  void router.push({ name: 'profile' })
+  void router.push({ name: 'account-profile' })
 }
 </script>
 
@@ -59,7 +59,7 @@ function openProfile() {
             <div><dt>手机</dt><dd>{{ auth.user?.phone || '未绑定' }}</dd></div>
           </dl>
           <div class="profile-actions">
-            <el-button text :icon="EditPen" @click="openProfile">编辑个人资料<el-icon><ArrowRight /></el-icon></el-button>
+            <el-button text :icon="Setting" @click="openAccount">账号管理<el-icon><ArrowRight /></el-icon></el-button>
             <el-button text type="danger" :icon="SwitchButton" :loading="loggingOut" @click="logout">退出登录</el-button>
           </div>
         </div>

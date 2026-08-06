@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import AppLayout from '@/layouts/AppLayout.vue'
+import AccountLayout from '@/layouts/AccountLayout.vue'
 import { pinia } from '@/stores'
 import { useAuthStore } from '@/stores/auth'
 import { authenticationRedirect } from './authGuard'
@@ -14,7 +15,16 @@ const router = createRouter({
       meta: { requiresAuth: true },
       children: [
         { path: '', name: 'home', component: () => import('@/views/HomeView.vue'), meta: { title: 'Cloud Console' } },
-        { path: 'profile', name: 'profile', component: () => import('@/views/ProfileView.vue'), meta: { title: '个人资料' } },
+        {
+          path: 'account',
+          component: AccountLayout,
+          children: [
+            { path: '', redirect: { name: 'account-profile' } },
+            { path: 'profile', name: 'account-profile', component: () => import('@/views/ProfileView.vue'), meta: { title: '基本资料' } },
+            { path: 'api-credentials', name: 'api-credentials', component: () => import('@/views/ApiCredentialsView.vue'), meta: { title: 'API 访问密钥' } },
+          ],
+        },
+        { path: 'profile', redirect: { name: 'account-profile' } },
       ],
     },
     { path: '/:pathMatch(.*)*', redirect: '/' },

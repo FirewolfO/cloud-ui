@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { ArrowLeft, Link, Message, Phone, User } from '@element-plus/icons-vue'
+import { Link, Message, Phone, User } from '@element-plus/icons-vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { apiMessage } from '@/api/client'
 import { useAuthStore } from '@/stores/auth'
@@ -14,7 +13,6 @@ interface ProfileForm {
   avatarUrl: string
 }
 
-const router = useRouter()
 const auth = useAuthStore()
 const formRef = ref<FormInstance>()
 const saving = ref(false)
@@ -54,11 +52,8 @@ async function save() {
 </script>
 
 <template>
-  <section class="profile-page">
-    <div class="page-heading">
-      <el-tooltip content="返回主页"><el-button :icon="ArrowLeft" circle aria-label="返回主页" @click="router.push({ name: 'home' })" /></el-tooltip>
-      <div><h1>个人资料</h1><span>@{{ auth.user?.username }}</span></div>
-    </div>
+  <section class="account-section">
+    <div class="account-content-heading"><div><h2>基本资料</h2><span>@{{ auth.user?.username }}</span></div></div>
 
     <div class="profile-editor">
       <aside class="avatar-preview">
@@ -71,7 +66,7 @@ async function save() {
         <el-form-item label="邮箱" prop="email"><el-input v-model="form.email" :prefix-icon="Message" maxlength="254" autocomplete="email" placeholder="未绑定" /></el-form-item>
         <el-form-item label="手机号" prop="phone"><el-input v-model="form.phone" :prefix-icon="Phone" maxlength="16" autocomplete="tel" placeholder="+8613800138000" /></el-form-item>
         <el-form-item label="头像地址" prop="avatarUrl"><el-input v-model="form.avatarUrl" :prefix-icon="Link" maxlength="1000" placeholder="https://example.com/avatar.png" /></el-form-item>
-        <div class="form-actions"><el-button @click="router.push({ name: 'home' })">取消</el-button><el-button type="primary" :loading="saving" @click="save">保存修改</el-button></div>
+        <div class="form-actions"><el-button type="primary" :loading="saving" @click="save">保存修改</el-button></div>
       </el-form>
     </div>
   </section>

@@ -46,3 +46,15 @@ export interface ProfileInput {
   phone: string | null
   avatarUrl: string | null
 }
+
+export interface ApiCredential {
+  id: string
+  name: string
+  accessKey: string
+  secretKey: string
+  createdAt: string
+}
+
+export interface ProgrammingAccess {
+  enabled: boolean
+}
