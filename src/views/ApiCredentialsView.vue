@@ -12,8 +12,6 @@ interface CredentialForm {
 
 const loading = ref(false)
 const saving = ref(false)
-const accessSaving = ref(false)
-const programmingEnabled = ref(false)
 const items = ref<ApiCredential[]>([])
 const createVisible = ref(false)
 const secretVisible = ref(false)
@@ -27,12 +25,7 @@ const rules: FormRules<CredentialForm> = {
 async function load() {
   loading.value = true
   try {
-    const [credentials, access] = await Promise.all([
-      accountApi.listCredentials(),
-      accountApi.getProgrammingAccess(),
-    ])
-    items.value = credentials
-    programmingEnabled.value = access.enabled
+    items.value = await accountApi.listCredentials()
   } catch (error) {
     ElMessage.error(apiMessage(error, 'API 访问密钥加载失败'))
   } finally {
@@ -78,26 +71,6 @@ async function remove(item: ApiCredential) {
   }
 }
 
-async function updateProgrammingAccess(enabled: string | number | boolean) {
-  const target = Boolean(enabled)
-  try {
-    await ElMessageBox.confirm(
-      target ? '确定开启编程访问吗？' : '确定关闭编程访问吗？',
-      target ? '开启编程访问' : '关闭编程访问',
-      { type: target ? 'warning' : 'info', confirmButtonText: '确定', cancelButtonText: '取消' },
-    )
-    accessSaving.value = true
-    const result = await accountApi.updateProgrammingAccess(target)
-    programmingEnabled.value = result.enabled
-    ElMessage.success(target ? '编程访问已开启' : '编程访问已关闭')
-  } catch (error) {
-    programmingEnabled.value = !target
-    if (error !== 'cancel' && error !== 'close') ElMessage.error(apiMessage(error, '编程访问设置失败'))
-  } finally {
-    accessSaving.value = false
-  }
-}
-
 async function copyText(value: string, label: string) {
   try {
     await navigator.clipboard.writeText(value)
@@ -119,10 +92,6 @@ onMounted(load)
   <section class="account-section">
     <div class="account-content-heading credentials-heading">
       <div><h2>API 访问密钥</h2><span>{{ items.length }} / 10</span></div>
-      <div class="programming-switch">
-        <span>编程访问</span>
-        <el-switch v-model="programmingEnabled" :loading="accessSaving" @change="updateProgrammingAccess" />
-      </div>
     </div>
 
     <div class="credential-toolbar">

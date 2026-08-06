@@ -54,7 +54,3 @@ export interface ApiCredential {
   secretKey: string
   createdAt: string
 }
-
-export interface ProgrammingAccess {
-  enabled: boolean
-}

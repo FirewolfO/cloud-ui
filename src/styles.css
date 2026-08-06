@@ -70,8 +70,6 @@ button, input, textarea { font: inherit; letter-spacing: 0; }
 .account-content-heading h2 { margin: 0; color: var(--ink); font-size: 18px; }
 .account-content-heading span { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; }
 .credentials-heading { align-items: center; }
-.programming-switch { display: flex; align-items: center; gap: 10px; color: var(--ink); font-size: 13px; }
-.programming-switch span { margin: 0; color: var(--ink); font-size: 13px; }
 .credential-toolbar { min-height: 48px; display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-bottom: 12px; }
 .account-table { border: 1px solid var(--line); }
 .credential-mobile-list { display: none; }
