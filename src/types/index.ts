@@ -47,6 +47,11 @@ export interface ProfileInput {
   avatarUrl: string | null
 }
 
+export interface PasswordUpdateInput {
+  currentPassword: string
+  newPassword: string
+}
+
 export interface ApiCredential {
   id: string
   name: string

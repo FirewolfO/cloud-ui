@@ -90,6 +90,10 @@ button, input, textarea { font: inherit; letter-spacing: 0; }
 .avatar-preview strong { max-width: 100%; overflow: hidden; color: var(--ink); font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
 .profile-form { max-width: 560px; }
 .form-actions { display: flex; justify-content: flex-end; gap: 8px; padding-top: 4px; }
+.password-editor { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 34px; margin-top: 32px; padding-top: 28px; border-top: 1px solid var(--line); }
+.password-heading { display: flex; align-items: center; gap: 10px; padding: 8px 12px; align-self: start; }
+.password-heading > span { width: 34px; height: 34px; display: grid; place-items: center; flex: none; border-radius: 5px; color: var(--accent); background: #eaf3f0; }
+.password-heading strong { color: var(--ink); font-size: 14px; }
 
 .el-button--primary { --el-button-bg-color: var(--accent); --el-button-border-color: var(--accent); --el-button-hover-bg-color: var(--accent-hover); --el-button-hover-border-color: var(--accent-hover); }
 .el-tabs { --el-color-primary: var(--accent); }
@@ -110,6 +114,8 @@ button, input, textarea { font: inherit; letter-spacing: 0; }
   .account-content-heading { margin-bottom: 16px; }
   .profile-page { width: calc(100% - 24px); padding-top: 18px; }
   .profile-editor { grid-template-columns: 1fr; gap: 10px; }
+  .password-editor { grid-template-columns: 1fr; gap: 14px; margin-top: 26px; padding-top: 22px; }
+  .password-heading { padding: 0; }
   .avatar-preview { padding-top: 0; }
   .profile-form { max-width: none; }
   .account-table { display: none; }

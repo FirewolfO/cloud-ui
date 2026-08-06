@@ -1,8 +1,12 @@
 import { api, unwrap } from './client'
 import { ensureCsrf } from './auth'
-import type { ApiCredential, ApiCredentialSecret } from '@/types'
+import type { ApiCredential, ApiCredentialSecret, PasswordUpdateInput } from '@/types'
 
 export const accountApi = {
+  updatePassword: async (input: PasswordUpdateInput) => {
+    await ensureCsrf()
+    return unwrap<{ updated: boolean }>(api.put('/account/password', input))
+  },
   listCredentials: () => unwrap<ApiCredential[]>(api.get('/account/api-credentials')),
   createCredential: async (name: string) => {
     await ensureCsrf()
