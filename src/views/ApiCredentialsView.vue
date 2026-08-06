@@ -5,6 +5,7 @@ import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'elem
 import { accountApi } from '@/api/account'
 import { apiMessage } from '@/api/client'
 import type { ApiCredential } from '@/types'
+import { writeClipboardText } from '@/utils/clipboard'
 
 interface CredentialForm {
   name: string
@@ -12,6 +13,7 @@ interface CredentialForm {
 
 const loading = ref(false)
 const saving = ref(false)
+const copyingSecretId = ref('')
 const items = ref<ApiCredential[]>([])
 const createVisible = ref(false)
 const secretVisible = ref(false)
@@ -73,10 +75,23 @@ async function remove(item: ApiCredential) {
 
 async function copyText(value: string, label: string) {
   try {
-    await navigator.clipboard.writeText(value)
+    await writeClipboardText(value)
     ElMessage.success(`${label} 已复制`)
   } catch {
     ElMessage.error(`${label} 复制失败`)
+  }
+}
+
+async function copySecret(item: ApiCredential) {
+  copyingSecretId.value = item.id
+  try {
+    const credential = await accountApi.getCredentialSecret(item.id)
+    await writeClipboardText(credential.secretKey)
+    ElMessage.success('SK 已复制')
+  } catch (error) {
+    ElMessage.error(apiMessage(error, 'SK 复制失败'))
+  } finally {
+    copyingSecretId.value = ''
   }
 }
 
@@ -106,7 +121,11 @@ onMounted(load)
           <div class="account-credential-value"><code>{{ row.accessKey }}</code><el-tooltip content="复制 AK"><el-button text :icon="CopyDocument" aria-label="复制 AK" @click="copyText(row.accessKey, 'AK')" /></el-tooltip></div>
         </template>
       </el-table-column>
-      <el-table-column label="Secret Key" min-width="180"><template #default="{ row }"><code>{{ row.secretKey }}</code></template></el-table-column>
+      <el-table-column label="Secret Key" min-width="180">
+        <template #default="{ row }">
+          <div class="account-credential-value"><code>{{ row.secretKey }}</code><el-tooltip content="复制 SK"><el-button text :icon="CopyDocument" aria-label="复制 SK" :loading="copyingSecretId === row.id" @click="copySecret(row)" /></el-tooltip></div>
+        </template>
+      </el-table-column>
       <el-table-column label="创建时间" width="180"><template #default="{ row }">{{ new Date(row.createdAt).toLocaleString() }}</template></el-table-column>
       <el-table-column label="操作" width="74" fixed="right">
         <template #default="{ row }"><el-tooltip content="删除密钥"><el-button text type="danger" :icon="Delete" aria-label="删除密钥" @click="remove(row)" /></el-tooltip></template>
@@ -117,7 +136,7 @@ onMounted(load)
       <article v-for="item in items" :key="item.id" class="credential-mobile-item">
         <header><strong>{{ item.name }}</strong><el-tooltip content="删除密钥"><el-button text type="danger" :icon="Delete" aria-label="删除密钥" @click="remove(item)" /></el-tooltip></header>
         <div><span>Access Key</span><code>{{ item.accessKey }}</code><el-tooltip content="复制 AK"><el-button text :icon="CopyDocument" aria-label="复制 AK" @click="copyText(item.accessKey, 'AK')" /></el-tooltip></div>
-        <div><span>Secret Key</span><code>{{ item.secretKey }}</code></div>
+        <div><span>Secret Key</span><code>{{ item.secretKey }}</code><el-tooltip content="复制 SK"><el-button text :icon="CopyDocument" aria-label="复制 SK" :loading="copyingSecretId === item.id" @click="copySecret(item)" /></el-tooltip></div>
         <time :datetime="item.createdAt">{{ new Date(item.createdAt).toLocaleString() }}</time>
       </article>
       <el-empty v-if="!loading && items.length === 0" :image-size="52" description="暂无 API 访问密钥" />

@@ -54,3 +54,7 @@ export interface ApiCredential {
   secretKey: string
   createdAt: string
 }
+
+export interface ApiCredentialSecret {
+  secretKey: string
+}

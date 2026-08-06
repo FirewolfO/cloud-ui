@@ -55,7 +55,7 @@ button, input, textarea { font: inherit; letter-spacing: 0; }
 .profile-actions .el-button { width: 100%; justify-content: flex-start; margin: 0; }
 .profile-actions .el-button .el-icon:last-child { margin-left: auto; }
 
-.account-page { width: min(1180px, calc(100% - 40px)); margin: 0 auto; padding: 28px 0 48px; }
+.account-page { width: 100%; margin: 0; padding: 28px 24px 48px; }
 .account-heading { display: flex; align-items: baseline; gap: 12px; margin-bottom: 18px; }
 .account-heading h1 { margin: 0; color: var(--ink); font-size: 21px; }
 .account-heading span { color: var(--muted); font-size: 12px; }
@@ -102,7 +102,7 @@ button, input, textarea { font: inherit; letter-spacing: 0; }
   .verification-row .el-button { width: 108px; }
   .auth-form-grid { grid-template-columns: 1fr; gap: 0; }
   .console-header { padding: 0 14px; }
-  .account-page { width: calc(100% - 24px); padding-top: 18px; }
+  .account-page { width: 100%; padding: 18px 12px 32px; }
   .account-workspace { min-height: 0; display: block; }
   .account-nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; padding: 10px; border-right: 0; border-bottom: 1px solid var(--line); }
   .account-nav a { justify-content: center; padding: 0 8px; }
