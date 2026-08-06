@@ -5,6 +5,7 @@ import vue from '@vitejs/plugin-vue'
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   const signinTarget = env.VITE_SIGNIN_PROXY_TARGET || 'http://127.0.0.1:8084'
+  const gatewayTarget = env.VITE_GATEWAY_PROXY_TARGET || 'http://127.0.0.1:8082'
 
   return {
     plugins: [vue()],
@@ -15,7 +16,12 @@ export default defineConfig(({ mode }) => {
       port: 5176,
       strictPort: true,
       proxy: {
-        '/api': {
+        '/api/open': {
+          target: gatewayTarget,
+          changeOrigin: true,
+          configure: (proxy) => proxy.on('proxyReq', (request) => request.removeHeader('origin')),
+        },
+        '/api/v1': {
           target: signinTarget,
           changeOrigin: true,
           configure: (proxy) => proxy.on('proxyReq', (request) => request.removeHeader('origin')),

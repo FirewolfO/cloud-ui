@@ -13,14 +13,14 @@
 
 ## 启动
 
-先启动 `sigin` 服务，然后执行：
+先启动 `sigin` 和 Gateway 服务，然后执行：
 
 ```bash
 npm install
 npm run dev
 ```
 
-前端默认监听 `http://localhost:5176`，并将 `/api` 代理到 `http://127.0.0.1:8084`。可通过 `.env.local` 中的 `VITE_SIGNIN_PROXY_TARGET` 覆盖后端地址。
+前端默认监听 `http://localhost:5176`。CSRF、登录、注册和验证码请求通过 `/api/v1` 代理到 `sigin` 的 `http://127.0.0.1:8084`；登录后的账号请求通过 `/api/open/signin` 代理到 Gateway 的 `http://127.0.0.1:8082`。可分别使用 `VITE_SIGNIN_PROXY_TARGET`、`VITE_GATEWAY_PROXY_TARGET` 覆盖目标地址。
 
 ## 验证
 

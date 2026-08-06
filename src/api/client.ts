@@ -8,19 +8,24 @@ interface ApiEnvelope<T> {
   requestId: string
 }
 
-export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api/v1',
-  timeout: 15_000,
-  withCredentials: true,
-  xsrfCookieName: 'XSRF-TOKEN',
-  xsrfHeaderName: 'X-XSRF-TOKEN',
-  headers: { 'Content-Type': 'application/json' },
-})
+function createApi(baseURL: string) {
+  const client = axios.create({
+    baseURL,
+    timeout: 15_000,
+    withCredentials: true,
+    xsrfCookieName: 'XSRF-TOKEN',
+    xsrfHeaderName: 'X-XSRF-TOKEN',
+    headers: { 'Content-Type': 'application/json' },
+  })
+  client.interceptors.request.use((config) => {
+    config.headers.set('X-Request-ID', createRequestId())
+    return config
+  })
+  return client
+}
 
-api.interceptors.request.use((config) => {
-  config.headers.set('X-Request-ID', createRequestId())
-  return config
-})
+export const api = createApi(import.meta.env.VITE_SIGNIN_API_BASE_URL || import.meta.env.VITE_API_BASE_URL || '/api/v1')
+export const gatewayApi = createApi(import.meta.env.VITE_GATEWAY_API_BASE_URL || '/api/open/signin')
 
 export async function unwrap<T>(promise: Promise<{ data: ApiEnvelope<T> }>): Promise<T> {
   return (await promise).data.data

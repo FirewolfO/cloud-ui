@@ -1,23 +1,18 @@
-import { api, unwrap } from './client'
-import { ensureCsrf } from './auth'
+import { gatewayApi, unwrap } from './client'
 import type { ApiCredential, ApiCredentialSecret, PasswordUpdateInput } from '@/types'
 
 export const accountApi = {
   updatePassword: async (input: PasswordUpdateInput) => {
-    await ensureCsrf()
-    return unwrap<{ updated: boolean }>(api.put('/account/password', input))
+    return unwrap<{ updated: boolean }>(gatewayApi.put('/account/password', input))
   },
-  listCredentials: () => unwrap<ApiCredential[]>(api.get('/account/api-credentials')),
+  listCredentials: () => unwrap<ApiCredential[]>(gatewayApi.get('/account/api-credentials')),
   createCredential: async (name: string) => {
-    await ensureCsrf()
-    return unwrap<ApiCredential>(api.post('/account/api-credentials', { name }))
+    return unwrap<ApiCredential>(gatewayApi.post('/account/api-credentials', { name }))
   },
   getCredentialSecret: async (id: string) => {
-    await ensureCsrf()
-    return unwrap<ApiCredentialSecret>(api.post(`/account/api-credentials/${id}/secret`))
+    return unwrap<ApiCredentialSecret>(gatewayApi.post(`/account/api-credentials/${id}/secret`))
   },
   deleteCredential: async (id: string) => {
-    await ensureCsrf()
-    return unwrap<{ deleted: boolean }>(api.delete(`/account/api-credentials/${id}`))
+    return unwrap<{ deleted: boolean }>(gatewayApi.delete(`/account/api-credentials/${id}`))
   },
 }

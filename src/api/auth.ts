@@ -1,4 +1,4 @@
-import { api, unwrap } from './client'
+import { api, gatewayApi, unwrap } from './client'
 import type {
   CloudUser,
   LoginInput,
@@ -14,7 +14,7 @@ export async function ensureCsrf() {
 }
 
 export const authApi = {
-  me: () => unwrap<CloudUser>(api.get('/auth/me')),
+  me: () => unwrap<CloudUser>(gatewayApi.get('/auth/me')),
   login: async (input: LoginInput) => {
     await ensureCsrf()
     return unwrap<CloudUser>(api.post('/auth/login', input))
@@ -32,11 +32,9 @@ export const authApi = {
     return unwrap<CloudUser>(api.post('/auth/register', input))
   },
   logout: async () => {
-    await ensureCsrf()
-    return unwrap<{ loggedOut: boolean }>(api.post('/auth/logout'))
+    return unwrap<{ loggedOut: boolean }>(gatewayApi.post('/auth/logout'))
   },
   updateProfile: async (input: ProfileInput) => {
-    await ensureCsrf()
-    return unwrap<CloudUser>(api.put('/account/profile', input))
+    return unwrap<CloudUser>(gatewayApi.put('/account/profile', input))
   },
 }
