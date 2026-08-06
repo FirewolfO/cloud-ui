@@ -12,6 +12,7 @@ import {
   type LoginMethod,
 } from '@/utils/loginIdentifier'
 import { nullable } from '@/utils/user'
+import PhoneNumberInput from '@/components/PhoneNumberInput.vue'
 
 interface LoginForm {
   identifier: string
@@ -187,7 +188,13 @@ async function submitRegister() {
           <el-form ref="loginRef" :model="loginForm" :rules="loginRules" label-position="top" @submit.prevent="submitLogin">
             <el-segmented v-model="loginMethod" :options="LOGIN_METHOD_OPTIONS" class="login-methods" />
             <el-form-item :label="loginField.label" prop="identifier">
+              <PhoneNumberInput
+                v-if="loginMethod === 'phone'"
+                v-model="loginForm.identifier"
+                placeholder="请输入手机号"
+              />
               <el-input
+                v-else
                 v-model="loginForm.identifier"
                 :prefix-icon="loginField.icon"
                 :type="loginField.type"
@@ -229,7 +236,7 @@ async function submitRegister() {
             <el-form-item label="密码" prop="password"><el-input v-model="registerForm.password" :prefix-icon="Lock" type="password" autocomplete="new-password" show-password /></el-form-item>
             <div class="auth-form-grid">
               <el-form-item label="邮箱（选填）" prop="email"><el-input v-model="registerForm.email" :prefix-icon="Message" autocomplete="email" /></el-form-item>
-              <el-form-item label="手机（选填）" prop="phone"><el-input v-model="registerForm.phone" :prefix-icon="Phone" autocomplete="tel" placeholder="+8613800138000" /></el-form-item>
+              <el-form-item label="手机（选填）" prop="phone"><PhoneNumberInput v-model="registerForm.phone" /></el-form-item>
             </div>
             <el-button class="submit-button" type="primary" native-type="submit" :loading="submitting">创建账号</el-button>
           </el-form>

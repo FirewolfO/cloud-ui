@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
-import { Link, Lock, Message, Phone, User } from '@element-plus/icons-vue'
+import { Link, Lock, Message, User } from '@element-plus/icons-vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { accountApi } from '@/api/account'
 import { apiMessage } from '@/api/client'
 import { useAuthStore } from '@/stores/auth'
 import { passwordConfirmationError } from '@/utils/password'
 import { nullable, userInitials } from '@/utils/user'
+import PhoneNumberInput from '@/components/PhoneNumberInput.vue'
 
 interface ProfileForm {
   displayName: string
@@ -115,7 +116,7 @@ async function changePassword() {
       <el-form ref="formRef" :model="form" :rules="rules" label-position="top" class="profile-form">
         <el-form-item label="显示名称" prop="displayName"><el-input v-model="form.displayName" :prefix-icon="User" maxlength="64" /></el-form-item>
         <el-form-item label="邮箱" prop="email"><el-input v-model="form.email" :prefix-icon="Message" maxlength="254" autocomplete="email" placeholder="未绑定" /></el-form-item>
-        <el-form-item label="手机号" prop="phone"><el-input v-model="form.phone" :prefix-icon="Phone" maxlength="16" autocomplete="tel" placeholder="+8613800138000" /></el-form-item>
+        <el-form-item label="手机号" prop="phone"><PhoneNumberInput v-model="form.phone" /></el-form-item>
         <el-form-item label="头像地址" prop="avatarUrl"><el-input v-model="form.avatarUrl" :prefix-icon="Link" maxlength="1000" placeholder="https://example.com/avatar.png" /></el-form-item>
         <div class="form-actions"><el-button type="primary" :loading="saving" @click="save">保存修改</el-button></div>
       </el-form>
