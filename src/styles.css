@@ -36,10 +36,19 @@ button, input, textarea { font: inherit; letter-spacing: 0; }
 .console-header { position: sticky; top: 0; z-index: 20; height: 62px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; background: var(--surface); border-bottom: 1px solid var(--line); }
 .console-brand { display: flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; }
 .console-brand strong { font-size: 15px; font-weight: 650; }
+.console-header-actions { display: flex; align-items: center; gap: 8px; }
+.console-header-actions > .el-button { color: #526068; }
+.console-header-actions > .el-button.is-active { color: var(--accent); background: #e9f3f0; }
 .avatar-button { width: 42px; height: 42px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; background: transparent; cursor: pointer; }
 .avatar-button:hover, .avatar-button:focus-visible { background: #edf4f2; outline: none; }
 .console-main { min-height: calc(100vh - 62px); }
 .home-workspace { min-height: calc(100vh - 62px); background: #f7f9fa; }
+.cloud-docs-page { height: calc(100vh - 62px); display: grid; grid-template-rows: 48px minmax(0, 1fr); overflow: hidden; background: var(--surface); }
+.cloud-docs-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 0 18px 0 24px; border-bottom: 1px solid var(--line); }
+.cloud-docs-toolbar > div { display: flex; align-items: center; gap: 8px; color: #46545b; font-size: 13px; font-weight: 650; }
+.cloud-docs-toolbar > div .el-icon { color: var(--accent); }
+.cloud-docs-frame { min-width: 0; min-height: 0; }
+.cloud-docs-frame iframe { display: block; width: 100%; height: 100%; border: 0; }
 
 .profile-popover { padding: 0 !important; }
 .profile-summary { padding: 16px; }
@@ -106,6 +115,12 @@ button, input, textarea { font: inherit; letter-spacing: 0; }
   .verification-row .el-button { width: 108px; }
   .auth-form-grid { grid-template-columns: 1fr; gap: 0; }
   .console-header { padding: 0 14px; }
+  .console-header-actions { gap: 2px; }
+  .console-header-actions > .el-button { width: 36px; padding: 8px; font-size: 0; }
+  .console-header-actions > .el-button .el-icon { font-size: 16px; }
+  .cloud-docs-toolbar { padding: 0 12px; }
+  .cloud-docs-toolbar .el-button { width: 36px; padding: 8px; font-size: 0; }
+  .cloud-docs-toolbar .el-button .el-icon { font-size: 16px; }
   .account-page { width: 100%; padding: 18px 12px 32px; }
   .account-workspace { min-height: 0; display: block; }
   .account-nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; padding: 10px; border-right: 0; border-bottom: 1px solid var(--line); }

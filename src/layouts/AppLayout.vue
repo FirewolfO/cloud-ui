@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ArrowRight, Cloudy, Setting, SwitchButton } from '@element-plus/icons-vue'
+import { ArrowRight, Cloudy, Document, Setting, SwitchButton } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { apiMessage } from '@/api/client'
 import { useAuthStore } from '@/stores/auth'
@@ -39,31 +39,34 @@ function openAccount() {
         <strong>Cloud Console</strong>
       </RouterLink>
 
-      <el-popover v-model:visible="profileVisible" placement="bottom-end" :width="300" trigger="click" popper-class="profile-popover">
-        <template #reference>
-          <button class="avatar-button" type="button" aria-label="打开用户信息">
-            <el-avatar :size="34" :src="auth.user?.avatarUrl || undefined">{{ initials }}</el-avatar>
-          </button>
-        </template>
+      <div class="console-header-actions">
+        <el-button text :icon="Document" :class="{ 'is-active': $route.name === 'open-api-docs' }" @click="router.push({ name: 'open-api-docs' })">API 文档</el-button>
+        <el-popover v-model:visible="profileVisible" placement="bottom-end" :width="300" trigger="click" popper-class="profile-popover">
+          <template #reference>
+            <button class="avatar-button" type="button" aria-label="打开用户信息">
+              <el-avatar :size="34" :src="auth.user?.avatarUrl || undefined">{{ initials }}</el-avatar>
+            </button>
+          </template>
 
-        <div class="profile-summary">
-          <div class="profile-identity">
-            <el-avatar :size="44" :src="auth.user?.avatarUrl || undefined">{{ initials }}</el-avatar>
-            <div>
-              <strong>{{ auth.user?.displayName }}</strong>
-              <span>@{{ auth.user?.username }}</span>
+          <div class="profile-summary">
+            <div class="profile-identity">
+              <el-avatar :size="44" :src="auth.user?.avatarUrl || undefined">{{ initials }}</el-avatar>
+              <div>
+                <strong>{{ auth.user?.displayName }}</strong>
+                <span>@{{ auth.user?.username }}</span>
+              </div>
+            </div>
+            <dl>
+              <div><dt>邮箱</dt><dd>{{ auth.user?.email || '未绑定' }}</dd></div>
+              <div><dt>手机</dt><dd>{{ auth.user?.phone || '未绑定' }}</dd></div>
+            </dl>
+            <div class="profile-actions">
+              <el-button text :icon="Setting" @click="openAccount">账号管理<el-icon><ArrowRight /></el-icon></el-button>
+              <el-button text type="danger" :icon="SwitchButton" :loading="loggingOut" @click="logout">退出登录</el-button>
             </div>
           </div>
-          <dl>
-            <div><dt>邮箱</dt><dd>{{ auth.user?.email || '未绑定' }}</dd></div>
-            <div><dt>手机</dt><dd>{{ auth.user?.phone || '未绑定' }}</dd></div>
-          </dl>
-          <div class="profile-actions">
-            <el-button text :icon="Setting" @click="openAccount">账号管理<el-icon><ArrowRight /></el-icon></el-button>
-            <el-button text type="danger" :icon="SwitchButton" :loading="loggingOut" @click="logout">退出登录</el-button>
-          </div>
-        </div>
-      </el-popover>
+        </el-popover>
+      </div>
     </header>
 
     <main class="console-main">

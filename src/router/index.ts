@@ -15,6 +15,7 @@ const router = createRouter({
       meta: { requiresAuth: true },
       children: [
         { path: '', name: 'home', component: () => import('@/views/HomeView.vue'), meta: { title: 'Cloud Console' } },
+        { path: 'docs', name: 'open-api-docs', component: () => import('@/views/DocsView.vue'), meta: { title: 'Open API 文档' } },
         {
           path: 'account',
           component: AccountLayout,
